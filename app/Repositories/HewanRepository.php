@@ -14,6 +14,11 @@ class HewanRepository
         $this->hewanModel = $hewanModel;
     }
 
+    public function findById($id)
+    {
+        return Pet::findOrFail($id);
+    }
+
     public function store(array $data)
     {
         return $this->hewanModel->create($data);
@@ -21,6 +26,12 @@ class HewanRepository
 
     public function searchByName(string $query)
     {
-        return Pet::whereRaw('LOWER(nama_penyewa) LIKE ?', ['%' . strtolower($query) . '%'])->paginate(10);
+        return Pet::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])->paginate(10);
+    }
+
+    public function delete($id)
+    {
+        $pet = Pet::findOrFail($id);
+        return $pet->delete();
     }
 }

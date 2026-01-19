@@ -40,25 +40,17 @@
     openTambahHewan() {
         window.dispatchEvent(new CustomEvent("open-tambah-hewan-modal"))
     },
-    openUbahBooking(booking) {
+    openUbah(hewan) {
         this.selectedHewan = {
-        ...booking,
-        durasi: `${booking.jam_akhir_sewa - booking.jam_awal_sewa}`,
-        harga_sewa: 25000,
+        ...hewan,
         };
         window.dispatchEvent(new CustomEvent("open-ubah-booking-modal"))
     },
-    openPerbaruiStatus(booking) {
+    openHapus(hewan){
         this.selectedHewan = {
-        ...booking,
+        ...hewan,
         };
-        window.dispatchEvent(new CustomEvent("open-perbarui-status-booking-modal"))
-    },
-    openModalJadwal(booking) {
-        this.selectedHewan = {
-        ...booking,
-        };
-        window.dispatchEvent(new CustomEvent("open-jadwal-modal"))
+        window.dispatchEvent(new CustomEvent("open-hapus-hewan-modal"));
     },
     displayedPages: [],
         init() {
@@ -122,7 +114,7 @@
                 this.fetchPage(1);
                 return;
             }
-        fetch(`/lapangan-badminton/search?query=${this.search}&page=${page}`, {
+        fetch(`/hewan/search?query=${this.search}&page=${page}`, {
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
                 }
@@ -247,17 +239,17 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-800 font-medium dark:text-gray-400"
+                                    <div class="text-sm text-gray-500 font-medium dark:text-gray-400"
                                         x-text="hewan.type">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-800 font-medium dark:text-gray-400"
+                                    <div class="text-sm text-gray-500 font-medium dark:text-gray-400"
                                         x-text="hewan.age">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-800 font-medium dark:text-gray-400"
+                                    <div class="text-sm text-gray-500 font-medium dark:text-gray-400"
                                         x-text="hewan.weight">
                                     </div>
                                 </td>
@@ -279,15 +271,15 @@
                                             </x-slot>
 
                                             <x-slot name="content">
-                                                <a href="#" @click="openUbahBooking(booking)"
+                                                <a href="#" @click="openUbah(hewan)"
                                                     class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                     role="menuitem">
-                                                    Ubah Booking
+                                                    Ubah
                                                 </a>
-                                                <a href="#" @click="openPerbaruiStatus(booking)"
+                                                <a href="#" @click="openHapus(hewan)"
                                                     class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                     role="menuitem">
-                                                    Perbarui Status
+                                                    Hapus
                                                 </a>
                                             </x-slot>
                                         </x-common.table-dropdown>
@@ -409,6 +401,101 @@
         </div>
     </x-ui.modal>
 
+    <x-ui.modal @open-ubah-hewan-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
+        <div x-data="editHewan()" x-init="init()"
+            class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
+            <div class="px-2 pr-14">
+                <h4 class="mb-2 text-2xl font-semibold">
+                    Tambah Hewan
+                </h4>
+            </div>
+
+            <template x-if="open">
+                <form class="flex flex-col">
+
+                    <div class="h-[400px] overflow-y-auto p-2">
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium">
+                                Data Hewan
+                            </label>
+                            <input type="text" x-model="form.raw_hewan" placeholder="Milo Kucing 2Th 4.5kg"
+                                class="h-11 w-full rounded-lg border px-4 text-sm" />
+
+                            <p class="text-red-500 text-sm mt-1" x-text="error"></p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium">
+                                Pemilik
+                            </label>
+
+                            <select x-model.number="form.owner_id"
+                                class="h-11 w-full rounded-lg border px-4 py-2.5 text-sm">
+
+                                <option value="">Pilih Pemilik</option>
+
+                                <template x-for="owner in owners" :key="owner.id">
+                                    <option :value="owner.id" x-text="`${owner.name} (${owner.phone})`">
+                                    </option>
+                                </template>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="flex justify-end gap-3 mt-6">
+                        <button type="button" @click="open = false" class="rounded-lg border px-4 py-2.5 text-sm">
+                            Close
+                        </button>
+
+                        <button type="button" @click="submit"
+                            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm text-white">
+                            Submit
+                        </button>
+                    </div>
+
+                </form>
+            </template>
+        </div>
+    </x-ui.modal>
+
+    <x-ui.modal @open-hapus-hewan-modal.window="open = true" :isOpen="false" class="max-w-[600px]">
+        <template x-if="open">
+            <form x-data="deleteHewan()" class="flex flex-col">
+                <div
+                    class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
+                    <div class="px-2">
+                        <div class="text-center mx-auto py-12">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                                stroke-width="1.5" stroke="currentColor" class="mx-auto size-20 text-gray-400">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z">
+                                </path>
+                            </svg>
+
+                            <h2 class="mt-6 text-2xl font-bold text-gray-900">Hewan akan dihapus</h2>
+
+                            <p class="mt-4 text-pretty text-gray-700"
+                                x-text="`Apakah anda yakin ingin menghapus ${selectedHewan.name}?`">
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 px-2 mt-4 lg:justify-center">
+                        <button @click="submit" type="button"
+                            class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
+                            Ya, Hapus
+                        </button>
+                        <button @click="open = false" type="button"
+                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
+                            Batal
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </template>
+    </x-ui.modal>
+
     <script>
         function addHewan() {
             return {
@@ -493,10 +580,148 @@
                             },
                             body: JSON.stringify(this.form)
                         })
+                        .then(async res => {
+                            if (!res.ok) {
+                                const data = await res.json();
+                                this.errors = data.errors || {};
+                                throw data;
+                            }
+                            return res.json();
+                        })
+                        .then(res => {
+                            sessionStorage.setItem('alert_add_success', res.message)
+                            window.location.reload();
+                        })
+                        .catch(err => {
+                            sessionStorage.setItem('alert_fail_error', err.message)
+                            window.location.reload();
+                            console.error(err);
+                        });
+                }
+            }
+        }
+
+        function editHewan() {
+            return {
+                open: true,
+                owners: [],
+                loadingOwners: false,
+
+                form: {
+                    owner_id: null,
+                    raw_hewan: '',
+                    name: '',
+                    type: '',
+                    age: null,
+                    weight: null,
+                },
+
+                error: null,
+
+                init() {
+                    this.fetchOwners();
+                },
+
+                fetchOwners() {
+                    fetch("{{ url('/owners/valid') }}", {
+                            headers: {
+                                "X-Requested-With": "XMLHttpRequest"
+                            }
+                        })
                         .then(res => res.json())
-                        .then(() => location.reload())
+                        .then(data => {
+                            this.owners = data;
+                        })
                         .catch(() => {
-                            this.error = 'Gagal menyimpan data';
+                            this.error = 'Gagal memuat data pemilik';
+                        });
+                },
+
+                parseHewan() {
+                    const clean = this.form.raw_hewan.replace(/\s+/g, ' ').trim();
+
+                    const regex =
+                        /^(.+?)\s+(.+?)\s+(\d+)\s*(tahun|thn|th)?\s+([\d.,]+)\s*(kg)?$/i;
+
+                    const match = clean.match(regex);
+
+                    if (!match) {
+                        this.error = 'Format salah. Contoh: Milo Kucing 2Th 4.5kg';
+                        return false;
+                    }
+
+                    const age = parseInt(match[3]);
+                    const weight = parseFloat(match[5].replace(',', '.'));
+
+                    if (age <= 0 || weight <= 0 || isNaN(weight)) {
+                        this.error = 'Usia atau berat tidak valid';
+                        return false;
+                    }
+
+                    this.form.name = match[1].toUpperCase();
+                    this.form.type = match[2].toUpperCase();
+                    this.form.age = age;
+                    this.form.weight = weight;
+
+                    return true;
+                },
+
+                submit() {
+                    this.error = null;
+
+                    if (!this.form.owner_id) {
+                        this.error = 'Pemilik wajib dipilih';
+                        return;
+                    }
+
+                    if (!this.parseHewan()) return;
+
+                    fetch("{{ url('hewan') }}", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            },
+                            body: JSON.stringify(this.form)
+                        })
+                        .then(async res => {
+                            if (!res.ok) {
+                                const data = await res.json();
+                                this.errors = data.errors || {};
+                                throw data;
+                            }
+                            return res.json();
+                        })
+                        .then(res => {
+                            sessionStorage.setItem('alert_add_success', res.message)
+                            window.location.reload();
+                        })
+                        .catch(err => {
+                            sessionStorage.setItem('alert_fail_error', err.message)
+                            window.location.reload();
+                            console.error(err);
+                        });
+                }
+            }
+        }
+
+        function deleteHewan() {
+            return {
+                submit() {
+                    fetch(`{{ url('hewan') }}/${this.selectedHewan.id}`, {
+                            method: "DELETE",
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(res => {
+                            sessionStorage.setItem('alert_delete_success', res.message);
+                            window.location.reload();
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
                         });
                 }
             }

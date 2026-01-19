@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\HewanService;
-use App\Http\Requests\LapanganBadminton\StoreRequest;
 use App\Http\Requests\Pet\StoreRequest as PetStoreRequest;
 
 class HewanController extends Controller
@@ -45,8 +44,18 @@ class HewanController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $bookings = $this->hewanService->search($query);
+        $hewans = $this->hewanService->search($query);
 
-        return response()->json($bookings);
+        return response()->json($hewans);
+    }
+
+    public function destroy($id)
+    {
+        $this->hewanService->destroy($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data hewan berhasil dihapus'
+        ]);
     }
 }

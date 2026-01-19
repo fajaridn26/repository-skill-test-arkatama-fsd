@@ -54,4 +54,10 @@ class HewanService
 
         return $this->hewanRepository->searchByName($query);
     }
+
+    public function destroy($id)
+    {
+        $pet = $this->hewanRepository->findById($id);
+        return $this->hewanRepository->delete($id);
+    }
 }

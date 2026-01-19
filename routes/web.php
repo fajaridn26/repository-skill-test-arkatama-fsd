@@ -48,6 +48,7 @@ Route::middleware(['auth', 'role:Super Admin'])
         Route::get('/', [HewanController::class, 'index']);
         Route::post('/', [HewanController::class, 'store']);
         Route::get('/search', [HewanController::class, 'search']);
+        Route::delete('/{id}', [HewanController::class, 'destroy']);
     });
 
 // Route::get('/blank', function () {
