@@ -41,12 +41,22 @@ class HewanController extends Controller
         ]);
     }
 
-    public function search(Request $request)
+    public function update(Request $request, $id)
     {
-        $query = $request->input('query');
-        $hewans = $this->hewanService->search($query);
+        $request->validate([
+            'owner_id' => 'required|exists:owners,id',
+            'name'     => 'required|string',
+            'type'     => 'required|string',
+            'age'      => 'required|integer|min:1',
+            'weight'   => 'required|numeric|min:0.1',
+        ]);
 
-        return response()->json($hewans);
+        $this->hewanService->update($id, $request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data hewan berhasil diperbarui'
+        ]);
     }
 
     public function destroy($id)
@@ -57,5 +67,13 @@ class HewanController extends Controller
             'success' => true,
             'message' => 'Data hewan berhasil dihapus'
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $query = $request->input('query');
+        $hewans = $this->hewanService->search($query);
+
+        return response()->json($hewans);
     }
 }

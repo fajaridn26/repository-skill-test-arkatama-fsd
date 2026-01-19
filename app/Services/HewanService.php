@@ -46,6 +46,25 @@ class HewanService
         return $this->hewanRepository->store($hewanData);
     }
 
+    public function update($id, array $data)
+    {
+        $updateData = [
+            'owner_id' => $data['owner_id'],
+            'name'     => strtoupper($data['name']),
+            'type'     => strtoupper($data['type']),
+            'age'      => (int) $data['age'],
+            'weight'   => (float) $data['weight'],
+        ];
+
+        return $this->hewanRepository->update($id, $updateData);
+    }
+
+    public function destroy($id)
+    {
+        $pet = $this->hewanRepository->findById($id);
+        return $this->hewanRepository->delete($id);
+    }
+
     public function search(string $query)
     {
         if (!$query) {
@@ -53,11 +72,5 @@ class HewanService
         }
 
         return $this->hewanRepository->searchByName($query);
-    }
-
-    public function destroy($id)
-    {
-        $pet = $this->hewanRepository->findById($id);
-        return $this->hewanRepository->delete($id);
     }
 }

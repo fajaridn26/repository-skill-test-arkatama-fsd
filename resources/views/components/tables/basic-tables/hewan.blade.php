@@ -44,7 +44,7 @@
         this.selectedHewan = {
         ...hewan,
         };
-        window.dispatchEvent(new CustomEvent("open-ubah-booking-modal"))
+        window.dispatchEvent(new CustomEvent("open-ubah-hewan-modal"))
     },
     openHapus(hewan){
         this.selectedHewan = {
@@ -229,8 +229,7 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500 dark:text-gray-400"
-                                        x-text="hewan.code">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400" x-text="hewan.code">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
@@ -401,12 +400,13 @@
         </div>
     </x-ui.modal>
 
-    <x-ui.modal @open-ubah-hewan-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
+    <x-ui.modal x-data="editHewan()" @open-ubah-hewan-modal.window="openModal($event.detail)"
+        class="max-w-[700px]">
         <div x-data="editHewan()" x-init="init()"
             class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
             <div class="px-2 pr-14">
                 <h4 class="mb-2 text-2xl font-semibold">
-                    Tambah Hewan
+                    Ubah Hewan
                 </h4>
             </div>
 
@@ -603,9 +603,9 @@
 
         function editHewan() {
             return {
-                open: true,
+                open: false,
                 owners: [],
-                loadingOwners: false,
+                petId: null,
 
                 form: {
                     owner_id: null,
@@ -618,14 +618,19 @@
 
                 error: null,
 
-                init() {
+                openModal(petId) {
+                    this.open = true;
+                    this.petId = petId;
+                    this.error = null;
+
                     this.fetchOwners();
+                    this.fetchPet();
                 },
 
                 fetchOwners() {
-                    fetch("{{ url('/owners/valid') }}", {
+                    fetch('/owners/valid', {
                             headers: {
-                                "X-Requested-With": "XMLHttpRequest"
+                                'X-Requested-With': 'XMLHttpRequest'
                             }
                         })
                         .then(res => res.json())
@@ -637,16 +642,31 @@
                         });
                 },
 
-                parseHewan() {
-                    const clean = this.form.raw_hewan.replace(/\s+/g, ' ').trim();
+                fetchPet() {
+                    fetch(`/hewan/${this.petId}`, {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest'
+                            }
+                        })
+                        .then(res => res.json())
+                        .then(pet => {
+                            this.form.owner_id = pet.owner_id;
+                            this.form.raw_hewan =
+                                `${pet.name} ${pet.type} ${pet.age}Th ${pet.weight}kg`;
+                        });
+                },
 
+                parseHewan() {
+                    this.error = null;
+
+                    const clean = this.form.raw_hewan.replace(/\s+/g, ' ').trim();
                     const regex =
                         /^(.+?)\s+(.+?)\s+(\d+)\s*(tahun|thn|th)?\s+([\d.,]+)\s*(kg)?$/i;
 
                     const match = clean.match(regex);
 
                     if (!match) {
-                        this.error = 'Format salah. Contoh: Milo Kucing 2Th 4.5kg';
+                        this.error = 'Format tidak valid. Contoh: Milo Kucing 2Th 4.5kg';
                         return false;
                     }
 
@@ -667,8 +687,6 @@
                 },
 
                 submit() {
-                    this.error = null;
-
                     if (!this.form.owner_id) {
                         this.error = 'Pemilik wajib dipilih';
                         return;
@@ -676,30 +694,22 @@
 
                     if (!this.parseHewan()) return;
 
-                    fetch("{{ url('hewan') }}", {
-                            method: "POST",
+                    fetch(`/hewan/${this.petId}`, {
+                            method: 'PUT',
                             headers: {
-                                "Content-Type": "application/json",
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
                             },
                             body: JSON.stringify(this.form)
                         })
-                        .then(async res => {
-                            if (!res.ok) {
-                                const data = await res.json();
-                                this.errors = data.errors || {};
-                                throw data;
-                            }
-                            return res.json();
-                        })
+                        .then(res => res.json())
                         .then(res => {
-                            sessionStorage.setItem('alert_add_success', res.message)
+                            sessionStorage.setItem('alert_success', res.message);
                             window.location.reload();
                         })
-                        .catch(err => {
-                            sessionStorage.setItem('alert_fail_error', err.message)
-                            window.location.reload();
-                            console.error(err);
+                        .catch(() => {
+                            this.error = 'Gagal menyimpan perubahan';
                         });
                 }
             }

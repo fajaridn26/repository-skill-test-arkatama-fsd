@@ -24,6 +24,13 @@ class HewanRepository
         return $this->hewanModel->create($data);
     }
 
+    public function update($id, array $data)
+    {
+        $pet = Pet::findOrFail($id);
+        $pet->update($data);
+        return $pet;
+    }
+
     public function searchByName(string $query)
     {
         return Pet::whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($query) . '%'])->paginate(10);
