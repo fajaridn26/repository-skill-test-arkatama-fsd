@@ -1,6 +1,6 @@
-@props(['tanggal', 'bulan', 'tahun'])
+@props([])
 <!-- Metric Group Four -->
-<div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+{{-- <div class="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
     <div class="grid grid-cols-1 gap-8 md:grid-cols-3 sm:grid-cols-2">
         <div x-data="filterTanggal('{{ $tanggal }}')">
             <h3 class="text-gray-800 dark:text-gray-300">Filter Tanggal</h3>
@@ -97,8 +97,4 @@
             </div>
         </div>
     </div>
-</div>
-
-
-
-<script></script>
+</div> --}}

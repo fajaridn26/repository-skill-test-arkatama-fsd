@@ -270,7 +270,8 @@
                                             </x-slot>
 
                                             <x-slot name="content">
-                                                <a href="#" @click="openUbah(hewan)"
+                                                <a href="#"
+                                                    @click.prevent="$dispatch('open-ubah-hewan-modal', hewan.id)"
                                                     class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                     role="menuitem">
                                                     Ubah
@@ -400,31 +401,41 @@
         </div>
     </x-ui.modal>
 
-    <x-ui.modal x-data="editHewan()" @open-ubah-hewan-modal.window="openModal($event.detail)"
-        class="max-w-[700px]">
-        <div x-data="editHewan()" x-init="init()"
+    <x-ui.modal class="max-w-[700px]">
+        <div x-data="editHewan()" @open-ubah-hewan-modal.window="openModal($event.detail)"
             class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
-            <div class="px-2 pr-14">
+
+            {{-- Header --}}
+            <div class="flex items-center justify-between px-2 pr-2">
                 <h4 class="mb-2 text-2xl font-semibold">
                     Ubah Hewan
                 </h4>
+
+                <button @click="open = false"
+                    class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100">
+                    ✕
+                </button>
             </div>
 
+            {{-- FORM --}}
             <template x-if="open">
                 <form class="flex flex-col">
 
                     <div class="h-[400px] overflow-y-auto p-2">
 
+                        {{-- Data Hewan --}}
                         <div class="mb-4">
                             <label class="block text-sm font-medium">
                                 Data Hewan
                             </label>
+
                             <input type="text" x-model="form.raw_hewan" placeholder="Milo Kucing 2Th 4.5kg"
                                 class="h-11 w-full rounded-lg border px-4 text-sm" />
 
-                            <p class="text-red-500 text-sm mt-1" x-text="error"></p>
+                            <p class="mt-1 text-sm text-red-500" x-text="error"></p>
                         </div>
 
+                        {{-- Pemilik --}}
                         <div>
                             <label class="block text-sm font-medium">
                                 Pemilik
@@ -432,7 +443,6 @@
 
                             <select x-model.number="form.owner_id"
                                 class="h-11 w-full rounded-lg border px-4 py-2.5 text-sm">
-
                                 <option value="">Pilih Pemilik</option>
 
                                 <template x-for="owner in owners" :key="owner.id">
@@ -444,6 +454,7 @@
 
                     </div>
 
+                    {{-- ACTION --}}
                     <div class="flex justify-end gap-3 mt-6">
                         <button type="button" @click="open = false" class="rounded-lg border px-4 py-2.5 text-sm">
                             Close
@@ -457,8 +468,10 @@
 
                 </form>
             </template>
+
         </div>
     </x-ui.modal>
+
 
     <x-ui.modal @open-hapus-hewan-modal.window="open = true" :isOpen="false" class="max-w-[600px]">
         <template x-if="open">
