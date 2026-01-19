@@ -35,8 +35,6 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-        "app/Helpers/BookingHelper.php",
-        "app/Helpers/TimeHelper.php"
     ]  
     },
     

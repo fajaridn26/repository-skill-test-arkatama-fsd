@@ -1,12 +1,12 @@
-@props(['users'])
+@props(['owners'])
 <div x-data='{
-    users: @json($users->items()),
-    perPage: @json($users->perPage()),
-    currentPage: @json($users->currentPage()),
-    totalPages: @json($users->lastPage()),
-    totalData: @json($users->total()),
-    selectedUsers: null,
-    selectedUser: {
+    owners: @json($owners->items()),
+    perPage: @json($owners->perPage()),
+    currentPage: @json($owners->currentPage()),
+    totalPages: @json($owners->lastPage()),
+    totalData: @json($owners->total()),
+    selectedOwners: null,
+    selectedOwner: {
     nama: "",
     email: "",
     kelas: "-",
@@ -27,11 +27,11 @@
         this.alertType = "error"
     },
     search: "",
-    openTambahUser(){
-        window.dispatchEvent(new CustomEvent("open-tambah-user-modal"));
+    openTambahOwner(){
+        window.dispatchEvent(new CustomEvent("open-tambah-owner-modal"));
     }, 
     openEdit(user){
-        this.selectedUser = {
+        this.selectedOwner = {
         ...user,
         kelas: user.kelas ?? "-",
         angkatan: user.angkatan ?? "-",
@@ -40,13 +40,13 @@
         window.dispatchEvent(new CustomEvent("open-edit-user-modal"));
     },
     openReset(user){
-        this.selectedUser = {
+        this.selectedOwner = {
         ...user,
         };
         window.dispatchEvent(new CustomEvent("open-reset-user-modal"));
     },
     openHapus(user){
-        this.selectedUser = {
+        this.selectedOwner = {
         ...user,
         };
         window.dispatchEvent(new CustomEvent("open-hapus-user-modal"));
@@ -93,19 +93,19 @@
             if(this.currentPage > 1){
                 const prev = this.currentPage - 1;
 
-                this.search ? this.searchUsers(prev) : this.fetchPage(prev)
+                this.search ? this.searchowners(prev) : this.fetchPage(prev)
             }
         },
         nextPage() {
             if(this.currentPage < this.totalPages){
                 const next = this.currentPage + 1;
 
-                this.search ? this.searchUsers(next) : this.fetchPage(next)
+                this.search ? this.searchowners(next) : this.fetchPage(next)
             }
         },
         goToPage(page) {
             if(this.search){
-                this.searchUsers(page)
+                this.searchowners(page)
             } else {
                 this.currentPage = page;
                 this.fetchPage(page); 
@@ -125,7 +125,7 @@
                 }
             }
         },
-        searchUsers(page = 1) {
+        searchowners(page = 1) {
             if (!this.search) {
             this.fetchPage(1);
             return;
@@ -138,7 +138,7 @@
     })
     .then(res => res.json())
     .then(res => {
-        this.users = res.data;
+        this.owners = res.data;
         this.currentPage = res.current_page;
         this.totalPages = res.last_page;
         this.perPage = res.per_page;
@@ -156,7 +156,7 @@
     })
     .then(res => res.json())
     .then(res => {
-        this.users = res.data;
+        this.owners = res.data;
         this.currentPage = res.current_page;
         this.totalPages = res.last_page;
         this.perPage = res.per_page;
@@ -172,7 +172,7 @@
         <!-- Header -->
         <div class="flex flex-col gap-2 px-5 mb-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
             <div>
-                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">List User</h3>
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white/90">List Owner</h3>
             </div>
         </div>
 
@@ -182,10 +182,7 @@
             <div class="max-w-full px-5 overflow-x-auto">
                 <div class="flex flex-col gap-3 justify-between sm:flex-row sm:items-center mb-4">
                     <div class="inline-flex gap-3">
-                        <x-ui.button @click="openTambahUser" size="sm" variant="primary">Tambah User</x-ui.button>
-                        <x-ui.button @click="openImport" size="sm" variant="outline-success"> <img
-                                src="{{ asset('icons/xlsx.png') }}" alt="" width="20">Import
-                            User</x-ui.button>
+                        <x-ui.button @click="openTambahOwner" size="sm" variant="primary">Tambah Owner</x-ui.button>
                     </div>
                     <form>
                         <div class="relative">
@@ -198,7 +195,7 @@
                                 </svg>
                             </button>
                             <input type="text" placeholder="Search..." x-model="search"
-                                @input.debounce.400ms="searchUsers"
+                                @input.debounce.400ms="searchowners"
                                 class="h-[42px] w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-[42px] pr-4 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-blue-800 xl:w-[300px]" />
                         </div>
                     </form>
@@ -226,26 +223,20 @@
                                 Nama</th>
                             <th scope="col"
                                 class="px-4 py-3 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                Kelas</th>
+                                Nomor Handphone</th>
                             <th scope="col"
                                 class="px-4 py-3 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                Angkatan</th>
-                            <th scope="col"
-                                class="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-500 capitalize">
                                 Email</th>
                             <th scope="col"
                                 class="px-4 py-3 text-xs font-medium tracking-wider text-left text-gray-500 capitalize">
-                                Nomor Whatsapp</th>
-                            <th scope="col"
-                                class="px-4 py-3 font-normal text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                Role</th>
+                                Alamat</th>
                             <th scope="col" class="relative px-4 py-3 capitalize">
                                 <span class="sr-only">Actions</span>
                             </th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                        <template x-for="(user, index) in users" :key="user.id">
+                        <template x-for="(owner, index) in owners" :key="owner.id">
                             <tr>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-500 dark:text-gray-400"
@@ -254,40 +245,23 @@
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-800 font-medium dark:text-gray-400"
-                                        x-text="user.nama">
+                                        x-text="owner.name">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-500 dark:text-gray-400"
-                                        x-text="user.kelas ? user.kelas : '-'">
+                                        x-text="owner.phone">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-500 dark:text-gray-400"
-                                        x-text="user.angkatan ? user.angkatan : '-'">
-                                    </div>
-                                </td>
-                                <td class="px-4
-                                        py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500 dark:text-gray-400" x-text="user.email">
+                                        x-text="owner.email">
                                     </div>
                                 </td>
                                 <td class="px-4 py-4 whitespace-nowrap">
                                     <div class="text-sm text-gray-500 dark:text-gray-400"
-                                        x-text="user.no_whatsapp ? user.no_whatsapp : '-'">
+                                        x-text="owner.address">
                                     </div>
-                                </td>
-                                <td class="px-4 py-4 whitespace-nowrap">
-                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                        :class="{
-                                            'bg-green-50 text-green-600 dark:bg-green-500/15 dark:text-green-500': user
-                                                .role === 'Super Admin',
-                                            'bg-yellow-50 text-yellow-600 dark:bg-yellow-500/15 dark:text-yellow-500': user
-                                                .role === 'Guru',
-                                            'bg-blue-50 text-blue-600 dark:bg-blue-500/15 dark:text-blue-500': user
-                                                .role === 'Siswa'
-                                        }"
-                                        x-text="user.role"></span>
                                 </td>
                                 <td class="px-4 py-4 text-sm font-medium text-right whitespace-nowrap">
                                     <div class="flex justify-center relative">
@@ -311,11 +285,6 @@
                                                     role="menuitem">
                                                     Ubah
                                                 </a>
-                                                <a href="#" @click="openReset(user)"
-                                                    class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                                                    role="menuitem">
-                                                    Reset Password
-                                                </a>
                                                 <a href="#" @click="openHapus(user)"
                                                     class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                     role="menuitem">
@@ -329,7 +298,7 @@
                         </template>
                     </tbody>
                     <td colspan="8" class="text-center">
-                        <div x-show="users.length === 0" class="max-w-md text-center mx-auto py-12">
+                        <div x-show="owners.length === 0" class="max-w-md text-center mx-auto py-12">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                                 stroke-width="1.5" stroke="currentColor" class="mx-auto size-20 text-gray-400">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -396,12 +365,12 @@
         </div>
     </div>
 
-    <x-ui.modal @open-tambah-user-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
+    <x-ui.modal @open-tambah-owner-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
         <div
             class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
             <div class="px-2 pr-14">
                 <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                    Tambah User
+                    Tambah Owner
                 </h4>
             </div>
             <template x-if="open">
@@ -413,7 +382,14 @@
                                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                         Nama
                                     </label>
-                                    <input type="text" x-model="form.nama" required
+                                    <input type="text" x-model="form.name" required
+                                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
+                                </div>
+                                <div class="col-span-2 lg:col-span-1">
+                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                        Nomor Handphone
+                                    </label>
+                                    <input type="text" x-model="form.phone" required
                                         class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                                 </div>
                                 <div class="col-span-2 lg:col-span-1">
@@ -425,48 +401,9 @@
                                 </div>
                                 <div class="col-span-2 lg:col-span-1">
                                     <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Kelas
+                                        Alamat
                                     </label>
-                                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                                        <select x-model="form.kelas" required
-                                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                            :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
-                                            @change="isOptionSelected = true">
-                                            <option value="" disabled selected
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                Pilih Kelas
-                                            </option>
-                                            <option value="X"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                X
-                                            </option>
-                                            <option value="XI"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                XI
-                                            </option>
-                                            <option value="XII"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                XII
-                                            </option>
-                                        </select>
-                                        <span
-                                            class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                            <svg class="stroke-current" width="20" height="20"
-                                                viewBox="0 0 20 20" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke=""
-                                                    stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Angkatan
-                                    </label>
-                                    <input type="text" x-model="form.angkatan" maxlength="4"
-                                        @input="form.angkatan = form.angkatan.replace(/[^0-9]/g, '')" required
+                                    <input type="text" x-model="form.address" required
                                         class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
                                 </div>
                             </div>
@@ -485,149 +422,6 @@
                 </form>
             </template>
         </div>
-    </x-ui.modal>
-
-    <x-ui.modal @open-edit-user-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
-        <div
-            class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-            <div class="px-2 pr-14">
-                <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                    Ubah User
-                </h4>
-                {{-- <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-                    Update your details to keep your profile up-to-date.
-                </p> --}}
-            </div>
-
-            <template x-if="open">
-                <form x-data="editUserForm()" class="flex flex-col">
-                    <div class="custom-scrollbar h-[320px] overflow-y-auto p-2">
-                        <div>
-                            {{-- <h5 class="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                                Personal Information
-                            </h5> --}}
-
-                            <div class="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                                <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Nama
-                                    </label>
-                                    <input type="text" x-model="selectedUser.nama"
-                                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div>
-                                <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Email
-                                    </label>
-                                    <input type="email" x-model="selectedUser.email"
-                                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div>
-                                <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Kelas
-                                    </label>
-                                    <div x-data="{ isOptionSelected: false }" class="relative z-20 bg-transparent">
-                                        <select x-model="selectedUser.kelas" required
-                                            class="dark:bg-dark-900 shadow-theme-xs focus:border-brand-300 focus:ring-brand-500/10 dark:focus:border-brand-800 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30"
-                                            :class="isOptionSelected && 'text-gray-800 dark:text-white/90'"
-                                            @change="isOptionSelected = true">
-                                            <option value=""
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                Pilih Kelas
-                                            </option>
-                                            <option value="X"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                X
-                                            </option>
-                                            <option value="XI"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                XI
-                                            </option>
-                                            <option value="XII"
-                                                class="text-gray-700 dark:bg-gray-900 dark:text-gray-400">
-                                                XII
-                                            </option>
-                                        </select>
-                                        <span
-                                            class="pointer-events-none absolute top-1/2 right-4 z-30 -translate-y-1/2 text-gray-700 dark:text-gray-400">
-                                            <svg class="stroke-current" width="20" height="20"
-                                                viewBox="0 0 20 20" fill="none"
-                                                xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M4.79175 7.396L10.0001 12.6043L15.2084 7.396" stroke=""
-                                                    stroke-width="1.5" stroke-linecap="round"
-                                                    stroke-linejoin="round" />
-                                            </svg>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Angkatan
-                                    </label>
-                                    <input type="text" x-model="selectedUser.angkatan" maxlength="4"
-                                        @input="selectedUser.angkatan = selectedUser.angkatan.replace(/[^0-9]/g, '')"
-                                        class="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div>
-                                {{-- <div class="col-span-2 lg:col-span-1">
-                                    <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                        Nomor Whatsapp
-                                    </label>
-                                    <input type="text" x-model="selectedUser.no_whatsapp"
-                                        class="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800" />
-                                </div> --}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                        <button @click="open = false" type="button"
-                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
-                            Close
-                        </button>
-                        <button @click="submit" type="button"
-                            class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </template>
-        </div>
-    </x-ui.modal>
-
-    <x-ui.modal @open-reset-user-modal.window="open = true" :isOpen="false" class="max-w-[600px]">
-        <template x-if="open">
-            <form x-data="resetPassword()" class="flex flex-col">
-                <div
-                    class="no-scrollbar relative w-full max-w-[600px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-                    <div class="px-2">
-                        <div class="text-center mx-auto py-12">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                stroke-width="1.5" stroke="currentColor" class="mx-auto size-20 text-gray-400">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z">
-                                </path>
-                            </svg>
-
-                            <h2 class="mt-6 text-2xl font-bold text-gray-900"
-                                x-text="`Password ${selectedUser.nama} akan direset`"></h2>
-
-                            <p class="mt-4 text-pretty text-gray-700">
-                                Apakahh anda yakin ingin mereset password?
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 px-2 mt-4 lg:justify-center">
-                        <button @click="submit" type="button"
-                            class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                            Ya, Reset
-                        </button>
-                        <button @click="open = false" type="button"
-                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
-                            Batal
-                        </button>
-                    </div>
-                </div>
-            </form>
-        </template>
     </x-ui.modal>
 
     <x-ui.modal @open-hapus-user-modal.window="open = true" :isOpen="false" class="max-w-[600px]">
@@ -647,7 +441,7 @@
                             <h2 class="mt-6 text-2xl font-bold text-gray-900">User akan dihapus</h2>
 
                             <p class="mt-4 text-pretty text-gray-700"
-                                x-text="`Apakah anda yakin ingin menghapus ${selectedUser.nama}?`">
+                                x-text="`Apakah anda yakin ingin menghapus ${selectedOwner.nama}?`">
                             </p>
                         </div>
                     </div>
@@ -666,63 +460,19 @@
         </template>
     </x-ui.modal>
 
-    <x-ui.modal @open-import-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
-        <div
-            class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
-            <div class="px-2 pr-14">
-                <h4 class="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                    Tambah User
-                </h4>
-                <p class="mb-6 text-sm text-gray-500 dark:text-gray-400 lg:mb-7">
-                    Tambahkan user melalui import excel.
-                </p>
-            </div>
-            <template x-if="open">
-                <form x-data="importUser()" class="flex flex-col">
-                    <div class="custom-scrollbar h-[240px] overflow-y-auto p-2">
-                        <div>
-                            <div>
-                                <label class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                    Upload file
-                                </label>
-                                <input type="file" x-model="form.importFile"
-                                    @change="form.importFile = $event.target.files[0]"
-                                    class="focus:border-ring-brand-300 shadow-theme-xs focus:file:ring-brand-300 h-11 w-full overflow-hidden rounded-lg border border-gray-300 bg-transparent text-sm text-gray-500 transition-colors file:mr-5 file:border-collapse file:cursor-pointer file:rounded-l-lg file:border-0 file:border-r file:border-solid file:border-gray-200 file:bg-gray-50 file:py-3 file:pr-3 file:pl-3.5 file:text-sm file:text-gray-700 placeholder:text-gray-400 hover:file:bg-gray-100 focus:outline-hidden dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400 dark:text-white/90 dark:file:border-gray-800 dark:file:bg-white/[0.03] dark:file:text-gray-400 dark:placeholder:text-gray-400" />
-                                <p class="mt-2 text-sm text-sky-500 dark:text-gray-400 lg:mb-7">
-                                    Pilih format XLSX. <a href="{{ asset('Tambah Siswa.xlsx') }}"
-                                        class="underline hover:text-sky-700">Download Template</a>
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-3 px-2 mt-6 lg:justify-end">
-                        <button @click="open = false" type="button"
-                            class="flex w-full justify-center rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-white/[0.03] sm:w-auto">
-                            Close
-                        </button>
-                        <button @click="submit" type="button"
-                            class="flex w-full justify-center rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 sm:w-auto">
-                            Submit
-                        </button>
-                    </div>
-                </form>
-            </template>
-        </div>
-    </x-ui.modal>
-
     <script>
         function addUserForm() {
             return {
                 form: {
-                    nama: '',
+                    name: '',
+                    phone: '',
                     email: '',
-                    kelas: '',
-                    angkatan: '',
+                    address: '',
                 },
                 errors: {},
 
                 submit() {
-                    fetch("{{ url('user') }}", {
+                    fetch("{{ url('owner') }}", {
                             method: "POST",
                             headers: {
                                 "Content-Type": "application/json",
@@ -757,14 +507,14 @@
                 errors: {},
 
                 submit() {
-                    fetch(`{{ url('user') }}/${this.selectedUser.id}`, {
+                    fetch(`{{ url('user') }}/${this.selectedOwner.id}`, {
                             method: "PUT",
                             headers: {
                                 "Content-Type": "application/json",
                                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
                                 "X-Requested-With": "XMLHttpRequest",
                             },
-                            body: JSON.stringify(this.selectedUser)
+                            body: JSON.stringify(this.selectedOwner)
                         })
                         .then(async res => {
                             if (!res.ok) {
@@ -790,14 +540,14 @@
                 errors: {},
 
                 submit() {
-                    fetch(`{{ url('user/reset-password') }}/${this.selectedUser.id}`, {
+                    fetch(`{{ url('user/reset-password') }}/${this.selectedOwner.id}`, {
                             method: "PUT",
                             headers: {
                                 "Content-Type": "application/json",
                                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
                                 "X-Requested-With": "XMLHttpRequest",
                             },
-                            body: JSON.stringify(this.selectedUser)
+                            body: JSON.stringify(this.selectedOwner)
                         })
                         .then(async res => {
                             if (!res.ok) {
@@ -821,7 +571,7 @@
         function hapusUser() {
             return {
                 submit() {
-                    fetch(`{{ url('user') }}/${this.selectedUser.id}`, {
+                    fetch(`{{ url('user') }}/${this.selectedOwner.id}`, {
                             method: "DELETE",
                             headers: {
                                 'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -835,44 +585,6 @@
                         })
                         .catch((error) => {
                             console.error('Error:', error);
-                        });
-                }
-            }
-        }
-
-        function importUser() {
-            return {
-                form: {
-                    importFile: null
-                },
-                errors: {},
-                submit() {
-                    const formData = new FormData();
-                    formData.append('importFile', this.form.importFile)
-                    fetch(`{{ url('user/import-excel') }}`, {
-                            method: "POST",
-                            body: formData,
-                            headers: {
-                                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                                "X-Requested-With": "XMLHttpRequest",
-                            }
-                        })
-                        .then(async res => {
-                            if (!res.ok) {
-                                const data = await res.json();
-                                this.errors = data.errors || {};
-                                throw data;
-                            }
-                            return res.json();
-                        })
-                        .then(res => {
-                            sessionStorage.setItem('alert_import_success', res.message);
-                            window.location.reload();
-                        })
-                        .catch((err) => {
-                            sessionStorage.setItem('alert_import_error', err.message);
-                            window.location.reload();
-                            console.error('Error:', err);
                         });
                 }
             }

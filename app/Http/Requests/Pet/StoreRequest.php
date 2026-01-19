@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\LapanganBadminton;
+namespace App\Http\Requests\Pet;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,13 +22,14 @@ class StoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nama_penyewa' => 'required|string|max:255',
-            'nomor_lapangan' => 'required|integer',
-            'tanggal_sewa' => 'required|date',
-            'jam_awal_sewa' => 'required|integer',
-            'jam_akhir_sewa' => 'required|integer',
-            'harga_sewa' => 'required',
-            'total_harga_sewa' => 'required',
+            'owner_id' => ['required', 'exists:owners,id'],
+            'raw_hewan' => ['required', 'string', 'max:255'],
+
+            'name' => ['required', 'string', 'max:100'],
+            'type' => ['required', 'string', 'max:100'],
+
+            'age' => ['required', 'integer', 'min:0'],
+            'weight' => ['required', 'numeric', 'min:0.1'],
         ];
     }
 }

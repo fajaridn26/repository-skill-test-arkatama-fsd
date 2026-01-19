@@ -2,7 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\LapanganBadmintonController;
+use App\Http\Controllers\HewanController;
+use App\Http\Controllers\OwnerController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 
@@ -29,24 +30,24 @@ Route::middleware(['auth'])->name(
 });
 
 Route::middleware(['auth', 'role:Super Admin'])->name(
-    'user'
-)->prefix('user')->group(function () {
-    Route::get('/', [UserController::class, 'index'])->name('users');
-    Route::post('/', [UserController::class, 'store'])->name('users.store');
-    Route::post('/import-excel', [UserController::class, 'importExcel'])->name('users.import');
-    Route::put('/reset-password/{id}', [UserController::class, 'resetPassword'])->name('users.resetPassword');
-    Route::get('/search', [UserController::class, 'search'])->name('users.search');
-    Route::put('/{id}', [UserController::class, 'edit'])->name('users.edit');
-    Route::delete('/{id}', [UserController::class, 'destroy'])->name('users.delete');
+    'owner'
+)->prefix('owner')->group(function () {
+    Route::get('/', [OwnerController::class, 'index'])->name('owner');
+    Route::post('/', [OwnerController::class, 'store'])->name('owner.store');
+    Route::get('/search', [OwnerController::class, 'search'])->name('owner.search');
+    Route::put('/{id}', [OwnerController::class, 'edit'])->name('owner.edit');
+    Route::delete('/{id}', [OwnerController::class, 'destroy'])->name('owner.delete');
 });
 
 Route::middleware(['auth', 'role:Super Admin'])
-    ->name('lapangan-badminton')->prefix('lapangan-badminton')
+    ->get('/owners/valid', [OwnerController::class, 'validOwners']);
+
+Route::middleware(['auth', 'role:Super Admin'])
+    ->name('hewan')->prefix('hewan')
     ->group(function () {
-        Route::get('/', [LapanganBadmintonController::class, 'index']);
-        Route::post('/', [LapanganBadmintonController::class, 'store']);
-        Route::get('/jadwal', [LapanganBadmintonController::class, 'jadwal']);
-        Route::get('/search', [LapanganBadmintonController::class, 'search']);
+        Route::get('/', [HewanController::class, 'index']);
+        Route::post('/', [HewanController::class, 'store']);
+        Route::get('/search', [HewanController::class, 'search']);
     });
 
 // Route::get('/blank', function () {

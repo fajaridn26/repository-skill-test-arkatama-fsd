@@ -34,16 +34,16 @@ class MenuHelper
             //         ['name' => 'Form Elements', 'path' => '/form-elements', 'pro' => false],
             //     ],
             // ],
-            // [
-            //     'name' => 'User',
-            //     'icon' => 'user-group',
-            //     'path' => '/user',
-            //     'roles' => ['Super Admin', 'Guru']
-            // ],
             [
-                'name' => 'Lapangan Badminton',
+                'name' => 'Owner',
+                'icon' => 'user-group',
+                'path' => '/owner',
+                'roles' => ['Super Admin']
+            ],
+            [
+                'name' => 'Hewan',
                 'icon' => 'task',
-                'path' => '/lapangan-badminton',
+                'path' => '/hewan',
                 'roles' => ['Super Admin']
             ],
             // [
