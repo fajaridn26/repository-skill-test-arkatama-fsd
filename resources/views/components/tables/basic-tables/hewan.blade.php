@@ -271,7 +271,13 @@
 
                                             <x-slot name="content">
                                                 <a href="#"
-                                                    @click.prevent="$dispatch('open-ubah-hewan-modal', hewan.id)"
+                                                    @click.prevent="
+        window.dispatchEvent(
+            new CustomEvent('open-ubah-hewan-modal', {
+                detail: hewan
+            })
+        )
+   "
                                                     class="flex w-full px-3 py-2 font-medium text-left text-gray-500 rounded-lg text-theme-xs hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                                     role="menuitem">
                                                     Ubah
@@ -401,68 +407,51 @@
         </div>
     </x-ui.modal>
 
-    <x-ui.modal class="max-w-[700px]">
-        <div x-data="editHewan()" @open-ubah-hewan-modal.window="openModal($event.detail)"
-            class="no-scrollbar relative w-full max-w-[700px] overflow-y-auto rounded-3xl bg-white p-4 lg:p-11">
+    <x-ui.modal @open-ubah-hewan-modal.window="open = true" :isOpen="false" class="max-w-[700px]">
+        <div x-data="editHewan()" x-init="init()"
+            class="relative w-full rounded-3xl bg-white p-4 lg:p-11">
 
-            {{-- Header --}}
-            <div class="flex items-center justify-between px-2 pr-2">
-                <h4 class="mb-2 text-2xl font-semibold">
-                    Ubah Hewan
-                </h4>
+            <h4 class="mb-4 text-2xl font-semibold">
+                Ubah Hewan
+            </h4>
 
-                <button @click="open = false"
-                    class="flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100">
-                    ✕
-                </button>
-            </div>
-
-            {{-- FORM --}}
             <template x-if="open">
                 <form class="flex flex-col">
 
-                    <div class="h-[400px] overflow-y-auto p-2">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium">
+                            Data Hewan
+                        </label>
 
-                        {{-- Data Hewan --}}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium">
-                                Data Hewan
-                            </label>
+                        <input type="text" x-model="form.raw_hewan"
+                            class="h-11 w-full rounded-lg border px-4 text-sm" />
 
-                            <input type="text" x-model="form.raw_hewan" placeholder="Milo Kucing 2Th 4.5kg"
-                                class="h-11 w-full rounded-lg border px-4 text-sm" />
-
-                            <p class="mt-1 text-sm text-red-500" x-text="error"></p>
-                        </div>
-
-                        {{-- Pemilik --}}
-                        <div>
-                            <label class="block text-sm font-medium">
-                                Pemilik
-                            </label>
-
-                            <select x-model.number="form.owner_id"
-                                class="h-11 w-full rounded-lg border px-4 py-2.5 text-sm">
-                                <option value="">Pilih Pemilik</option>
-
-                                <template x-for="owner in owners" :key="owner.id">
-                                    <option :value="owner.id" x-text="`${owner.name} (${owner.phone})`">
-                                    </option>
-                                </template>
-                            </select>
-                        </div>
-
+                        <p class="text-red-500 text-sm mt-1" x-text="error"></p>
                     </div>
 
-                    {{-- ACTION --}}
-                    <div class="flex justify-end gap-3 mt-6">
-                        <button type="button" @click="open = false" class="rounded-lg border px-4 py-2.5 text-sm">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium">
+                            Pemilik
+                        </label>
+
+                        <select x-model.number="form.owner_id" class="h-11 w-full rounded-lg border px-4 text-sm">
+                            <option value="">Pilih Pemilik</option>
+
+                            <template x-for="owner in owners" :key="owner.id">
+                                <option :value="owner.id" x-text="`${owner.name} (${owner.phone})`">
+                                </option>
+                            </template>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-end gap-3">
+                        <button type="button" @click="open = false" class="rounded-lg border px-4 py-2 text-sm">
                             Close
                         </button>
 
                         <button type="button" @click="submit"
-                            class="rounded-lg bg-brand-500 px-4 py-2.5 text-sm text-white">
-                            Submit
+                            class="rounded-lg bg-brand-500 px-4 py-2 text-sm text-white">
+                            Simpan
                         </button>
                     </div>
 
@@ -471,6 +460,7 @@
 
         </div>
     </x-ui.modal>
+
 
 
     <x-ui.modal @open-hapus-hewan-modal.window="open = true" :isOpen="false" class="max-w-[600px]">
@@ -619,6 +609,7 @@
                 open: false,
                 owners: [],
                 petId: null,
+                error: null,
 
                 form: {
                     owner_id: null,
@@ -629,15 +620,19 @@
                     weight: null,
                 },
 
-                error: null,
+                init() {
+                    window.addEventListener('open-ubah-hewan-modal', (e) => {
+                        const pet = e.detail;
 
-                openModal(petId) {
-                    this.open = true;
-                    this.petId = petId;
-                    this.error = null;
+                        this.open = true;
+                        this.petId = pet.id;
 
-                    this.fetchOwners();
-                    this.fetchPet();
+                        this.form.owner_id = pet.owner_id;
+                        this.form.raw_hewan =
+                            `${pet.name} ${pet.type} ${pet.age}Th ${pet.weight}kg`;
+
+                        this.fetchOwners();
+                    });
                 },
 
                 fetchOwners() {
@@ -647,54 +642,27 @@
                             }
                         })
                         .then(res => res.json())
-                        .then(data => {
-                            this.owners = data;
-                        })
-                        .catch(() => {
-                            this.error = 'Gagal memuat data pemilik';
-                        });
-                },
-
-                fetchPet() {
-                    fetch(`/hewan/${this.petId}`, {
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest'
-                            }
-                        })
-                        .then(res => res.json())
-                        .then(pet => {
-                            this.form.owner_id = pet.owner_id;
-                            this.form.raw_hewan =
-                                `${pet.name} ${pet.type} ${pet.age}Th ${pet.weight}kg`;
-                        });
+                        .then(data => this.owners = data)
+                        .catch(() => this.error = 'Gagal memuat pemilik');
                 },
 
                 parseHewan() {
                     this.error = null;
 
-                    const clean = this.form.raw_hewan.replace(/\s+/g, ' ').trim();
                     const regex =
-                        /^(.+?)\s+(.+?)\s+(\d+)\s*(tahun|thn|th)?\s+([\d.,]+)\s*(kg)?$/i;
+                        /^(.+?)\s+(.+?)\s+(\d+)\s*(th|thn|tahun)?\s+([\d.,]+)\s*(kg)?$/i;
 
-                    const match = clean.match(regex);
+                    const match = this.form.raw_hewan.trim().match(regex);
 
                     if (!match) {
-                        this.error = 'Format tidak valid. Contoh: Milo Kucing 2Th 4.5kg';
-                        return false;
-                    }
-
-                    const age = parseInt(match[3]);
-                    const weight = parseFloat(match[5].replace(',', '.'));
-
-                    if (age <= 0 || weight <= 0 || isNaN(weight)) {
-                        this.error = 'Usia atau berat tidak valid';
+                        this.error = 'Format tidak valid';
                         return false;
                     }
 
                     this.form.name = match[1].toUpperCase();
                     this.form.type = match[2].toUpperCase();
-                    this.form.age = age;
-                    this.form.weight = weight;
+                    this.form.age = parseInt(match[3]);
+                    this.form.weight = parseFloat(match[5].replace(',', '.'));
 
                     return true;
                 },
@@ -717,13 +685,8 @@
                             body: JSON.stringify(this.form)
                         })
                         .then(res => res.json())
-                        .then(res => {
-                            sessionStorage.setItem('alert_success', res.message);
-                            window.location.reload();
-                        })
-                        .catch(() => {
-                            this.error = 'Gagal menyimpan perubahan';
-                        });
+                        .then(() => window.location.reload())
+                        .catch(() => this.error = 'Gagal menyimpan');
                 }
             }
         }
